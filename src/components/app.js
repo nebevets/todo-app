@@ -27,13 +27,21 @@ class App extends Component{
             list: [item, ...this.state.list]
         })
     }
+    deleteItem = index => {
+        const {list} = this.state;
+        const listCopy = list.slice();
+        listCopy.splice(index, 1);
+        this.setState({
+            list: listCopy
+        });
+    }
     render(){
         const {list} = this.state;
         return (
             <div className="container">
                 <h1 className="center">To Do List</h1>
                 <AddItem add={this.addItem}/>
-                <List data={list}/>
+                <List data={list} delete={this.deleteItem}/>
             </div>
         );
     }
