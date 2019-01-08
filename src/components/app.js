@@ -13,14 +13,33 @@ class App extends Component{
         super(props);
         this.state = {
             list: [],
-            error: '' // this is for setting error message state
+            error: '' // this is for setting error message
         }
     }
     componentDidMount(){
         this.getListData();
     }
     async getListData(){
-        /* this is using .then() promise
+        if(this.state.error !== ''){
+            this.setState({
+                error: ''
+            });
+        }
+        try{
+            const response = await axios.get(`${BASE_URL}/todos${API_KEY}`);
+            if(!response.data.success){
+                throw new Error('sum ting wong');
+            }
+            this.setState({
+                list: response.data.todos
+            });
+        }catch(error){
+            console.error(error);
+            this.setState({
+                error: error.message
+            });
+        }
+        /* this is using .then() promise, async/await not necessary
         //call server to get data
         const response = axios.get(`${BASE_URL}/todos${API_KEY}`).then(
             response => {
@@ -37,23 +56,21 @@ class App extends Component{
         );
         //console.log('axio return value: ', response); //this is a way to tell if there is a promise
         */
-       try{
-            const response = await axios.get(`${BASE_URL}/todos${API_KEY}`);
+    }
+    addItem = async item => {    
+        try{
+            const response = await axios.post(`${BASE_URL}/todos${API_KEY}`, item);
             if(!response.data.success){
-                throw new Error('Something went wrong');
+                throw new Error('something went horribly wrong');
             }
-            this.setState({
-                list: response.data.todos
-            });
-       }catch(error){
-            console.log(error);
+            this.getListData();
+        }catch(error){
+            console.error(error);
             this.setState({
                 error: error.message
             });
-       }
-    }
-    addItem = async item => {
-        /* this is using .then() promise
+        }
+        /* this is using .then() promise, async/await not necessary
         axios.post(`${BASE_URL}/todos${API_KEY}`, item).then(
             response => {
                 //console.log('add item response: ', response);
@@ -68,11 +85,20 @@ class App extends Component{
             }
         );
         */
-
-        const response = await axios.post(`${BASE_URL}/todos${API_KEY}`, item);
-        this.getListData();
     }
     deleteItem = async id => {
+        try{
+            const response = await axios.delete(`${BASE_URL}/todos/${id + API_KEY}`);
+            if(!response.data.success){
+                throw new Error('oh, the humanity');
+            }
+            this.getListData(); 
+        }catch(error){
+            console.error(error);
+            this.setState({
+                error: error.message
+            });
+        }
         /* dummy data deleteItem code
         const {list} = this.state;
         const listCopy = list.slice();
@@ -82,8 +108,6 @@ class App extends Component{
         });
         */
         //console.log('deleting item: ', id);
-        await axios.delete(`${BASE_URL}/todos/${id + API_KEY}`);
-        this.getListData();
     }
     render(){
         const {list, error} = this.state;
