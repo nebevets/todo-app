@@ -3,7 +3,8 @@ import axios from 'axios';
 import List from './list';
 import 'materialize-css/dist/css/materialize.min.css';
 import AddItem from './add_item';
-import dummyListData from '../dummy_data/list_data';
+//import dummyListData from '../dummy_data/list_data';
+import {Route} from 'react-router-dom';
 
 const BASE_URL = 'http://api.reactprototypes.com';
 const API_KEY = '?key=c718_nebevets';
@@ -109,14 +110,17 @@ class App extends Component{
         */
         //console.log('deleting item: ', id);
     }
+    // 41:42 pt6 video
     render(){
         const {list, error} = this.state;
         return (
             <div className="container">
-                <h1 className="center">To Do List</h1>
-                <AddItem add={this.addItem}/>
-                <p className="red-text">{error}</p>
-                <List data={list} delete={this.deleteItem}/>
+                <Route path="/" exact render={ routingInfo => {
+                    return <List {...routingInfo} error={error} data={list} delete={this.deleteItem}/>
+                }}/>
+                <Route path="/add-item" render={ routingInfo => {
+                    return <AddItem {...routingInfo} add={this.addItem}/>
+                }}/>
             </div>
         );
     }
